@@ -340,6 +340,6 @@ int main(){
   	  apaga_helicopteroE2D(coluna, 0);
     }
   }
-  getche(); 
+  getchar(); 
 
 }
