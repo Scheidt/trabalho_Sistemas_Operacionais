@@ -22,11 +22,19 @@ int main() {
     render_bomb(display, 400, 300);
     render_ruin(display);
     render_hospital(display);
+    /*
+    struct {
+        x = 125
+        y = 550
+        width = 75
+        hight = 50
+    } bridge_position
+    */
     render_road(display);
 
     al_flip_display(); // Flip the display to show the rendered image
 
-    al_rest(5.0); // Display the image for 5 seconds
+    al_rest(15.0); // Display the image for 5 seconds
 
     al_destroy_display(display);
 
