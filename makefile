@@ -25,7 +25,7 @@ endif
 ##
 ifeq ($(OS), PlainWindows)
   TARGET = executable.exe
-  RM_COMMAND = del /s /q
+  RM_COMMAND = del /q /f
   CLEAN_PATH = *.o
   SOURCE_FILES = src\main.cpp src\physics\physics.hpp #Por o diretorio de todos os arquivos .cpp
   O_FILES = $(subst src\,build\,$(SOURCE_FILES:.cpp=.o))
@@ -42,23 +42,35 @@ endif
 ##
 $(TARGET): $(O_FILES)
 	@$(MAKE_DIR) $(dir $@)
-	$(CC) $^ -o $(TARGET) $(C_FLAGS)
+	@echo compiling executable...
+	@$(CC) $^ -o $(TARGET) $(C_FLAGS)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@$(MAKE_DIR) $(dir $@)
 	@echo compiling $@
 	@$(CC) $(C_FLAGS) -c -o $@ $<
 
+$(BUILD_DIR)\\%.o: $(SRC_DIR)\%.cpp
+	@$(MAKE_DIR) $(dir $@)
+	@echo compiling $@
+	@$(CC) $(C_FLAGS) -c -o $@ $<
+
+##
+## Commands
+##
 build: $(TARGET)
 
 run:
-	@./$(TARGET)
+	./$(TARGET)
 
 clean:
 	@echo deleting... $(O_FILES)
 	@$(RM_COMMAND) $(O_FILES) $(TARGET)
+
 test:
-	@echo $(SOURCE_FILES)
 	@echo $(OS)
+	@echo $(SOURCE_FILES)
+	@echo $(O_FILES)
+	@echo $(TARGET)
 
 .PHONY: clean build run
