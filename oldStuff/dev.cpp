@@ -1,8 +1,14 @@
-#include "main.hpp"
+#include <stdio.h>
+#include <stdlib.h>
+#include <windows.h>
+#include <time.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <conio.h>
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_image.h>
 
-int main(){
-    hello();
-
+int main() {
     ALLEGRO_DISPLAY *display = NULL;
 
     if (!al_init()) {
@@ -23,12 +29,7 @@ int main(){
 
     al_clear_to_color(al_map_rgb(0, 0, 0)); // Clear the screen to black
 
-    #ifdef OS_WINDOWS
-        ALLEGRO_BITMAP *image = al_load_bitmap("assets\image.jpg"); // Load your image file
-    #endif
-    #ifdef OS_LINUX
-        ALLEGRO_BITMAP *image = al_load_bitmap("assets/image.jpg"); // Load your image file
-    #endif
+    ALLEGRO_BITMAP *image = al_load_bitmap("image.jpeg"); // Load your image file
 
     if (!image) {
         fprintf(stderr, "Failed to load image!\n");
