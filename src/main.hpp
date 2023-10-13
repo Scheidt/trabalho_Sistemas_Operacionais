@@ -1,8 +1,8 @@
 #ifndef MAIN_HPP
 #define MAIN_HPP
 
-//#define OS_WINDOWS
-#define OS_LINUX
+#define OS_WINDOWS
+//define OS_LINUX
 
 // Standart libraries
 #include <stdio.h>
@@ -17,5 +17,6 @@
 
 // Project File
 #include "physics/physics.hpp"
+#include "rendering/rendering.hpp"
 
 #endif
