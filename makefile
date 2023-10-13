@@ -5,7 +5,7 @@ CC = g++
 SRC_DIR = src
 BUILD_DIR = build
 WARNINGS =-Wall -Wextra -Wshadow -Wconversion
-ALLEGRO_TAGS := -lallegro -lallegro_font -lallegro_primitives
+ALLEGRO_TAGS := -lallegro -lallegro_font -lallegro_primitives -lallegro_image
 C_FLAGS = -O2 $(WARNINGS) $(ALLEGRO_TAGS) 
 
 ##
