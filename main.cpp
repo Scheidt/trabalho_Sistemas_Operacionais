@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <time.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 
 int x, missao=0;
