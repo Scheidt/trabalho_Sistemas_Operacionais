@@ -1,12 +1,13 @@
 #include "main.hpp"
 
+ALLEGRO_DISPLAY *display = al_create_display(800, 600);
+
 int main() {
     if (!al_init()) {
         fprintf(stderr, "Failed to initialize Allegro!\n");
         return -1;
     }
 
-    ALLEGRO_DISPLAY *display = al_create_display(800, 600);
 
     if (!display) {
         fprintf(stderr, "Failed to create display!\n");

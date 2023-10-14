@@ -3,15 +3,45 @@
 
 #include <stdio.h>
 #include <allegro5/allegro.h>
+#include <iostream>
+#include "src/rendering/rendering.cpp"
+#include "src/physics/physics.cpp"
 
-void spawn_test(ALLEGRO_DISPLAY *display, float x, float y, float width, float height);
-void spawn_choppa(ALLEGRO_DISPLAY *display, float x, float y, bool right);
-void spawn_cannon(ALLEGRO_DISPLAY *display, float x, float y);
-void spawn_bomb(ALLEGRO_DISPLAY *display, float x, float y);
-void spawn_ruin(ALLEGRO_DISPLAY *display);
-void spawn_hospital(ALLEGRO_DISPLAY *display);
-void spawn_background(ALLEGRO_DISPLAY *display);
-void spawn_road(ALLEGRO_DISPLAY *display);
+const int choppa_width = 100;
+const int choppa_height = 50;
+
+const int cannon_width = 50;
+const int cannon_height = 50;
+const int max_ammo = 3;
+const float reload_time = 0.1;
+
+const int bomb_width = 50;
+const int bomb_height = 50;
+
+const int hospitalX = 690;
+const int ruinX = 0;
+
+const int buildingY = 210;
+const int building_width = 100;
+const int building_height = 350;
+
+const int backgroundX = 0;
+const int backgroundY = 800;
+const int background_width = 800;
+const int background_height = 600;
+
+const int roadX = 0;
+const int roadY = 550;
+const int road_width = 800;
+const int road_heigth = 50;
+
+const int bridgeX = 125;
+const int bridgeY = 550;
+const int bridge_width = 75;
+const int bridge_height = 50;
+
+
+
 
 
 #endif

@@ -1,6 +1,19 @@
 #include "rendering.hpp"
 
 
+ALLEGRO_DISPLAY *display = al_create_display(800, 600);
+
+void render_object(ALLEGRO_DISPLAY *display, float x, float y, float width, float height, char* source) {
+    al_init_image_addon();
+    ALLEGRO_BITMAP *image = al_load_bitmap(source);
+    // Set the target bitmap to draw the image onto
+    al_set_target_bitmap(al_get_backbuffer(display));
+
+    al_draw_scaled_bitmap(image, 0, 0, al_get_bitmap_width(image), al_get_bitmap_height(image),
+                          x, y, width, height, 0);
+ 
+};
+
 void render_test(ALLEGRO_DISPLAY *display, float x, float y, float width, float height) {
     al_init_image_addon();
     ALLEGRO_BITMAP *image = al_load_bitmap("assets/test square.png");

@@ -8,6 +8,7 @@
 #include <cstdio> // Include the <cstdio> header for fprintf
 #include <iostream> // Include <iostream> for std::cerr
 
+void render_object(ALLEGRO_DISPLAY *display, float x, float y, float width, float height, char* source);
 void render_test(ALLEGRO_DISPLAY *display, float x, float y, float width, float height);
 void render_choppa(ALLEGRO_DISPLAY *display, float x, float y, bool right);
 void render_cannon(ALLEGRO_DISPLAY *display, float x, float y);
