@@ -19,5 +19,5 @@ g++ src\\main.cpp src\\physics\\physics.cpp src\\rendering\\rendering.cpp -o exe
 ### Opção 3 (Usando CMD) Linux
 
 ```bash
-g++ src/main.cpp src/physics/physics.cpp -o executable.exe -Wall -Wextra -Wshadow -Wconversion -lallegro -lallegro_font -lallegro_primitives -lallegro_image
+g++ src/main.cpp src/physics/physics.cpp src/rendering/rendering.cpp -o executable.exe -Wall -Wextra -Wshadow -Wconversion -lallegro -lallegro_font -lallegro_primitives -lallegro_image
 ```

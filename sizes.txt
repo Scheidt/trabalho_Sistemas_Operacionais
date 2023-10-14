@@ -1,0 +1,32 @@
+choppa_width = 100;
+choppa_height = 50;
+
+cannon_width = 50;
+cannon_height = 50;
+max_ammo = 3;
+reload_time = 0.1;
+
+bomb_width = 50;
+bomb_height = 50;
+
+hospitalX = 690;
+ruinX = 0;
+
+buildingY = 210;
+building_width = 100;
+building_height = 350;
+
+backgroundX = 0;
+backgroundY = 800;
+background_width = 800;
+background_height = 600;
+
+roadX = 0;
+roadY = 550;
+road_width = 800;
+road_heigth = 50;
+
+bridgeX = 125;
+bridgeY = 550;
+bridge_width = 75;
+bridge_height = 50;
