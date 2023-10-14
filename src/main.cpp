@@ -3,6 +3,7 @@
 ALLEGRO_DISPLAY *display = al_create_display(800, 600);
 
 int main() {
+    al_init_image_addon();
     if (!al_init()) {
         fprintf(stderr, "Failed to initialize Allegro!\n");
         return -1;

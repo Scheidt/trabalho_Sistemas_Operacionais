@@ -4,7 +4,6 @@
 ALLEGRO_DISPLAY *display = al_create_display(800, 600);
 
 void render_object(ALLEGRO_DISPLAY *display, float x, float y, float width, float height, char* source) {
-    al_init_image_addon();
     ALLEGRO_BITMAP *image = al_load_bitmap(source);
     // Set the target bitmap to draw the image onto
     al_set_target_bitmap(al_get_backbuffer(display));
@@ -15,7 +14,6 @@ void render_object(ALLEGRO_DISPLAY *display, float x, float y, float width, floa
 };
 
 void render_test(ALLEGRO_DISPLAY *display, float x, float y, float width, float height) {
-    al_init_image_addon();
     ALLEGRO_BITMAP *image = al_load_bitmap("assets/test square.png");
     // Set the target bitmap to draw the image onto
     al_set_target_bitmap(al_get_backbuffer(display));
@@ -26,7 +24,6 @@ void render_test(ALLEGRO_DISPLAY *display, float x, float y, float width, float 
 };
 
 void render_choppa(ALLEGRO_DISPLAY *display, float x, float y, bool right) {
-    al_init_image_addon();
     ALLEGRO_BITMAP *image = al_load_bitmap("assets/helicopter.png");
     // Set the target bitmap to draw the image onto
     al_set_target_bitmap(al_get_backbuffer(display));
@@ -42,7 +39,6 @@ void render_choppa(ALLEGRO_DISPLAY *display, float x, float y, bool right) {
 };
 
 void render_cannon(ALLEGRO_DISPLAY *display, float x, float y) {
-    al_init_image_addon();
     ALLEGRO_BITMAP *image = al_load_bitmap("assets/cannon.png");
     // Set the target bitmap to draw the image onto
     al_set_target_bitmap(al_get_backbuffer(display));
@@ -55,7 +51,6 @@ void render_cannon(ALLEGRO_DISPLAY *display, float x, float y) {
 };
 
 void render_bomb(ALLEGRO_DISPLAY *display, float x, float y) {
-    al_init_image_addon();
     ALLEGRO_BITMAP *image = al_load_bitmap("assets/bomb.png");
     // Set the target bitmap to draw the image onto
     al_set_target_bitmap(al_get_backbuffer(display));
@@ -68,7 +63,6 @@ void render_bomb(ALLEGRO_DISPLAY *display, float x, float y) {
 };
 
 void render_ruin(ALLEGRO_DISPLAY *display) {
-    al_init_image_addon();
     ALLEGRO_BITMAP *image = al_load_bitmap("assets/burnt building.png");
     // Set the target bitmap to draw the image onto
     al_set_target_bitmap(al_get_backbuffer(display));
@@ -81,7 +75,6 @@ void render_ruin(ALLEGRO_DISPLAY *display) {
 };
 
 void render_hospital(ALLEGRO_DISPLAY *display) {
-    al_init_image_addon();
     ALLEGRO_BITMAP *image = al_load_bitmap("assets/hospital.png");
     // Set the target bitmap to draw the image onto
     al_set_target_bitmap(al_get_backbuffer(display));
@@ -94,7 +87,6 @@ void render_hospital(ALLEGRO_DISPLAY *display) {
 };
 
 void render_road(ALLEGRO_DISPLAY *display) {
-    al_init_image_addon();
     ALLEGRO_BITMAP *image = al_load_bitmap("assets/road.png");
     // Set the target bitmap to draw the image onto
     al_set_target_bitmap(al_get_backbuffer(display));
@@ -107,7 +99,6 @@ void render_road(ALLEGRO_DISPLAY *display) {
 };
 
 void render_background(ALLEGRO_DISPLAY *display) { // PRONTO, VAMO Q VAMO
-    al_init_image_addon();
     ALLEGRO_BITMAP *image = al_load_bitmap("assets/bkground.png");
     // Set the target bitmap to draw the image onto
     al_set_target_bitmap(al_get_backbuffer(display));
