@@ -1,12 +1,12 @@
 #include "physics.hpp"
 
-retangleObject::retangleObject(
+RectangleObject::RectangleObject(
     float xa, 
     float ya, 
     float w, 
     float h, 
     char* path
-):x(xa), y(ya), width(w), height(h){
+):x(xa), y(ya), width(w), height(h){ // x = xa, y = ya
     sprite.image = al_load_bitmap(path);
     if(!sprite.image){
         fprintf(stderr, "Failed to load image!\n");
@@ -17,7 +17,7 @@ retangleObject::retangleObject(
     sprite.height = al_get_bitmap_height(sprite.image);
 }
 
-void retangleObject::render(){
+void RectangleObject::render(){
     al_draw_scaled_bitmap(
         sprite.image, 
         0, 0, 
@@ -27,7 +27,12 @@ void retangleObject::render(){
     );
 }
 
-bool retangleObject::isColided(retangleObject& another){
+void RectangleObject::move(int xa, int ya){
+    x = x + xa;
+    y = y + ya;
+}
+
+bool RectangleObject::isColided(RectangleObject& another){
     if(
         x < another.x + another.width &&
         x + width > another.x &&

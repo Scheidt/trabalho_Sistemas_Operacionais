@@ -20,7 +20,6 @@
 
 // Project File
 #include "physics/physics.hpp"
-#include "rendering/rendering.hpp"
 
 #define WIDTH 800
 #define HEIGHT 600

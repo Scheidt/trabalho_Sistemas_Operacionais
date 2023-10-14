@@ -53,6 +53,17 @@ int main() {
     bool redraw = true;
     bool loop = true;
 
+    int choppaX = 55;
+    int choppaY = 55;
+    bool right = true;
+    RectangleObject choppa(55, 55, 100, 50, "assets/helicopter.png");
+    RectangleObject cannon0(200, 500, 50, 50, "assets/cannon.png");
+    RectangleObject cannon1(300, 500, 50, 50, "assets/cannon.png");
+    RectangleObject hospital(690, 210, 100, 350, "assets/hospital.png");
+    RectangleObject ruin(0, 210, 100, 350, "assets/burnt building.png");
+    RectangleObject background(0, 0, 800, 600, "assets/bkground.png");
+    RectangleObject road(0, 550, 800, 50, "assets/road.png");
+
     while (loop){
         // Waiting for any event to happen (timer, keyboard, mouse, ext...)
         al_wait_for_event(queue, &event);
@@ -75,34 +86,33 @@ int main() {
             redraw = true;
             break;
         }
-        // as setas são left, right, up, down
-        // Executed each time event when as the last event
-        if(redraw && al_is_event_queue_empty(queue)){
-            // Dealing with pressed keys
+        
+        if(redraw && al_is_event_queue_empty(queue)){ // Render stuff
+            // Dealing with user input
             if(pressed_keys[ALLEGRO_KEY_DOWN]){
-                
+                choppa.move(0, 5);
             }
             if(pressed_keys[ALLEGRO_KEY_UP]){
-                
+                choppa.move(0, -5);
             }
             if(pressed_keys[ALLEGRO_KEY_LEFT]){
-                
+                choppa.move(-5, 0);
             }
             if(pressed_keys[ALLEGRO_KEY_RIGHT]){
-                
+                choppa.move(5, 0);
             }
 
             // Clean buffer
             
-            render_background(display);
+            background.render();
+            hospital.render();
+            ruin.render();
+            road.render();
 
             // Render Objects
-            render_choppa(display, 200, 100.0, false); // Render the helicopter at (100, 100)
-            render_cannon(display, 200, 500);
-            render_bomb(display, 400, 300);
-            render_ruin(display);
-            render_hospital(display);
-            render_road(display);
+            choppa.render();
+            cannon0.render();
+            cannon1.render();
 
             al_flip_display(); // Flip the display to show the rendered image
             
