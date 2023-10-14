@@ -86,7 +86,7 @@ int main() {
             redraw = true;
             break;
         }
-        
+
         if(redraw && al_is_event_queue_empty(queue)){ // Render stuff
             // Dealing with user input
             if(pressed_keys[ALLEGRO_KEY_DOWN]){
@@ -115,8 +115,12 @@ int main() {
             cannon1.render();
 
             al_flip_display(); // Flip the display to show the rendered image
-            
-            //restar counting
+            if (choppa.isColided(road) || choppa.isColided(cannon0) || choppa.isColided(cannon1) || choppa.isColided(hospital) || choppa.isColided(ruin)){
+                break;
+            }
+
+
+            //restart counting
             redraw = false;
         }
     }
