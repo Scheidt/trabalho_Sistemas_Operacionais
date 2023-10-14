@@ -16,6 +16,7 @@ void render_ruin(ALLEGRO_DISPLAY *display);
 void render_hospital(ALLEGRO_DISPLAY *display);
 void render_background(ALLEGRO_DISPLAY *display);
 void render_road(ALLEGRO_DISPLAY *display);
+void render_hostage_count(ALLEGRO_DISPLAY *display, int count);
 
 
 

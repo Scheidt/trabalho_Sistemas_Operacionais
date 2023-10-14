@@ -1,4 +1,5 @@
 #include "rendering.hpp"
+#include <allegro5/allegro_font.h>
 
 
 void render_test(ALLEGRO_DISPLAY *display, float x, float y, float width, float height) {
@@ -105,3 +106,12 @@ void render_background(ALLEGRO_DISPLAY *display) { // PRONTO, VAMO Q VAMO
 
     al_destroy_bitmap(image);
 };
+
+void render_hostage_count(ALLEGRO_DISPLAY *display, int count) {
+    char buffer[50];
+    snprintf(buffer, sizeof(buffer), "Hostages: %d", count);
+
+    al_draw_text(al_create_builtin_font(), al_map_rgb(0, 0, 255), 10, 10, 0, buffer); // changed to blue
+
+}
+
