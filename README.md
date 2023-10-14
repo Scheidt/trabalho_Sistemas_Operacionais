@@ -13,7 +13,7 @@ make build run
 ### Opção 2 (Usando CMD) Windows
 
 ```bash
-g++ src\\main.cpp src\\physics\\physics.cpp src\\rendering\\rendering.cpp -o executable.exe -Wall -Wextra -Wshadow -Wconversion -lallegro -lallegro_font -lallegro_primitives -lallegro_image
+g++ src\\main.cpp src\\physics\\physics.cpp src\\rendering\\rendering.cpp src\\objects\\objects.cpp -o executable.exe -Wall -Wextra -Wshadow -Wconversion -lallegro -lallegro_font -lallegro_primitives -lallegro_image
 ```
 
 ### Opção 3 (Usando CMD) Linux

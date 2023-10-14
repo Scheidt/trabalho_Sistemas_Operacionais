@@ -62,7 +62,7 @@ void render_ruin(ALLEGRO_DISPLAY *display) {
 
 
     al_draw_scaled_bitmap(image, 0, 0, al_get_bitmap_width(image), al_get_bitmap_height(image),
-                         0, 210, 200, 350, 0);
+                         0, 210, 100, 350, 0);
 
     al_destroy_bitmap(image);
 };
@@ -75,7 +75,7 @@ void render_hospital(ALLEGRO_DISPLAY *display) {
 
 
     al_draw_scaled_bitmap(image, 0, 0, al_get_bitmap_width(image), al_get_bitmap_height(image),
-                         625, 210, 200, 350, 0);
+                         690, 210, 100, 350, 0);
 
     al_destroy_bitmap(image);
 };

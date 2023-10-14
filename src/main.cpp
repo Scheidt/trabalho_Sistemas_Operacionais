@@ -34,7 +34,7 @@ int main() {
 
     al_flip_display(); // Flip the display to show the rendered image
 
-    al_rest(15.0); // Display the image for 5 seconds
+    al_rest(5.0); // Display the image for 5 seconds
 
     al_destroy_display(display);
 
