@@ -32,6 +32,12 @@ void RectangleObject::move(int xa, int ya){
     y = y + ya;
 }
 
+void RectangleObject::setPosition(float xa, float ya) {
+    x = xa;
+    y = ya;
+}
+
+
 bool RectangleObject::isColided(RectangleObject& another){
     if(
         x < another.x + another.width &&

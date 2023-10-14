@@ -22,6 +22,7 @@ class RectangleObject{
         RectangleObject(float xa, float ya, float w, float h, char* path);
         void render();
         void move(int xa, int ya);
+        void setPosition(float x, float y);
         bool isColided(RectangleObject& another);
 };
 
