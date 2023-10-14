@@ -1,7 +1,6 @@
 #include "rendering.hpp"
 
-
-ALLEGRO_DISPLAY *display = al_create_display(800, 600);
+//ALLEGRO_DISPLAY *display = al_create_display(800, 600);
 
 void render_object(ALLEGRO_DISPLAY *display, float x, float y, float width, float height, char* source) {
     ALLEGRO_BITMAP *image = al_load_bitmap(source);
