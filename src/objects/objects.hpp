@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <allegro5/allegro.h>
 #include <iostream>
-#include "src/rendering/rendering.cpp"
-#include "src/physics/physics.cpp"
+#include "../rendering/rendering.cpp"
+#include "../physics/physics.cpp"
 
 const int choppa_width = 100;
 const int choppa_height = 50;

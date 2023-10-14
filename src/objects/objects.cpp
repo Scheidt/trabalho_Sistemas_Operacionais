@@ -64,7 +64,6 @@ public:
 
     // Implementation of the spawn method
     void spawn() {
-        render_object(display, )
     }
 };
 
