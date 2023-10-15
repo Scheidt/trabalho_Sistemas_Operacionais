@@ -8,46 +8,48 @@ CannonObject::CannonObject(
     int h,
     int max_ammo,
     float reload_time
-) : RectangleObject(xa, ya, w, h, "assets/cannon.png"), max_ammo(max_ammo), reload_time(reload_time), ammo(max_ammo) {
-        // Any additional initialization specific to CannonObject can go here
-    };
+) : RectangleObject(xa, ya, w, h, "assets/cannon.png"), max_ammo(max_ammo), reload_time(reload_time), ammo(max_ammo) {};
 
-int* CannonObject::update(){
-    if ((ammo == 0) && (x == 50)){
+
+std::pair<int, int> CannonObject::update() {
+    int velX = 0;
+    int velY = 0;
+
+    if ((ammo <= 0) && (x == 50)) {
         Sleep(reload_time);
         ammo = max_ammo;
     }
-    if((ammo <= 0) && (x > 51)){
+    if ((ammo <= 0) && (x > 51)) {
         move(-5, 0);
     } else {
-        switch (rand()%3){
+        switch (rand()%8){
             case 0:
                 if (x > 50){
-                    move(-5, 0);
+                    move(-7, 0);
                 };
                 break;
             case 1:
                 if (x < 750){
-                    move(5, 0);
+                    move(7, 0);
                 };
                 break;
             case 2:
+                if (x < 750){
+                    move(7, 0);
+                };
                 break;
             default:
                 break;
         }
-        int* arr = (int*)malloc(2 * sizeof(int));
-        if (rand()%100 == 42){
-            ammo --;
-            int velX = (rand()%5) * ((rand()%2)*2 - 1);
-            int velY = (rand()%5) * (-1);
-            arr[0] = velX;
-            arr[1] = velY;
-            return arr;
-        } else {
-            arr[0] = 0;
-            arr[1] = 0;
-        }
     }
-    
+    if (rand() % 100 == 42) {
+        velX = (rand() % 3) * ((rand() % 2) * 2 - 1); //0~3 * 50% de chance de ser positivo ou negativo
+        velY = ((rand() % 5) + 2) * (-1);
+    }
+
+    return std::make_pair(velX, velY);
+}
+
+void CannonObject::reduceAmmo(){
+    ammo --;
 }

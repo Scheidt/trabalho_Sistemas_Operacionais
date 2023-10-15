@@ -7,7 +7,7 @@
 // Standart libraries
 #include <stdio.h>
 #include <stdlib.h>
-//
+#include <iostream>
 #include <pthread.h>
 // Allegro includes
 #include <allegro5/allegro.h>
