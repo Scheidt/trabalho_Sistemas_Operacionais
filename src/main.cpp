@@ -2,8 +2,11 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
 
-int hostages_count = 0;
+int hostages_count = 5;
 int bomb_count = 5;
+int hostages_onboard = 1;
+
+
 
 struct Bomb {
     float x;
@@ -27,9 +30,11 @@ void render_explosion(ALLEGRO_DISPLAY *display, float x, float y) {
     al_draw_bitmap(explosion_image, x, y, 0);
 }
 
-void render_bomb_count(ALLEGRO_DISPLAY *display, int bomb_count) {
+void render_info(ALLEGRO_DISPLAY *display, int bomb_count, int hostages_count, int hostages_onboard) {
     ALLEGRO_FONT *font = al_create_builtin_font();
     al_draw_textf(font, al_map_rgb(255, 255, 255), 50, 50, ALLEGRO_ALIGN_LEFT, "Bombs: %d", bomb_count);
+    al_draw_textf(font, al_map_rgb(255, 255, 255), 50, 70, ALLEGRO_ALIGN_LEFT, "Hostages remaining: %d", hostages_count);
+    al_draw_textf(font, al_map_rgb(255, 255, 255), 50, 90, ALLEGRO_ALIGN_LEFT, "Hostages onboard: %d", hostages_onboard);
     al_destroy_font(font);
 }
 
@@ -106,6 +111,7 @@ int main() {
 
     while (loop) {
     al_wait_for_event(queue, &event);
+    
 
     switch (event.type) {
     case ALLEGRO_EVENT_DISPLAY_CLOSE:
@@ -124,6 +130,17 @@ int main() {
         redraw = true;
         break;
     }
+
+
+    if ((choppa.x < ruin.x + ruin.width) && (choppa.y > ruin.y - 80) && hostages_onboard == 0 && hostages_count > 0) {
+        hostages_onboard = 1;
+        hostages_count--;  // Decrease the hostage count when a hostage is picked up
+    }
+
+    if ((choppa.x > hospital.x) && (choppa.y > hospital.y - 80) && hostages_onboard > 0) {
+        hostages_onboard = 0;  // No hostages onboard after dropping off
+    }
+
 
     if (redraw && al_is_event_queue_empty(queue)) {
         if (pressed_keys[ALLEGRO_KEY_DOWN]) {
@@ -167,7 +184,7 @@ int main() {
         hospital.render();
         ruin.render();
         road.render();
-
+        render_info(display, bomb_count, hostages_count, hostages_onboard);
         choppa.render();
         cannon0.render();
         cannon1.render();
@@ -179,7 +196,6 @@ int main() {
             render_explosion(display, explosion.x, explosion.y);
         }
 
-        render_bomb_count(display, bomb_count);
 
         al_flip_display();
 
