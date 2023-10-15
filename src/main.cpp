@@ -2,8 +2,10 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
 
-int hostages_count = 0;
+const int hostages_count = 0;
 int bomb_count = 5;
+const int max_ammo_const = 3;
+const float reload_time_const = 1/10;
 
 struct Bomb {
     float x;
@@ -34,8 +36,9 @@ void render_bomb_count(ALLEGRO_DISPLAY *display, int bomb_count) {
 }
 
 int main() {
-    // Random number seed
+    
     srand((unsigned int)time(NULL));
+
     const int width = WIDTH;
     const int height = HEIGHT;
 
@@ -96,13 +99,14 @@ int main() {
     int choppaY = 55;
     bool right = true;
     RectangleObject choppa(55, 55, 100, 50, "assets/helicopter.png");
-    RectangleObject cannon0(200, 500, 50, 50, "assets/cannon.png");
-    RectangleObject cannon1(300, 500, 50, 50, "assets/cannon.png");
+    CannonObject cannon0(200, 500, 50, 50, max_ammo_const, reload_time_const);
+    CannonObject cannon1(300, 500, 50, 50, max_ammo_const, reload_time_const);
     RectangleObject hospital(690, 210, 100, 350, "assets/hospital.png");
     RectangleObject ruin(0, 210, 100, 350, "assets/burnt building.png");
     RectangleObject background(0, 0, 800, 600, "assets/bkground.png");
     RectangleObject road(0, 550, 800, 50, "assets/road.png");
     RectangleObject bomba(200, 500, 15, 15, "assets/bomb.png");
+    RectangleObject ammo_storage(50, 500, 100, 50, "assets/ammo_storage.png");
 
     while (loop) {
     al_wait_for_event(queue, &event);
@@ -167,6 +171,7 @@ int main() {
         hospital.render();
         ruin.render();
         road.render();
+        ammo_storage.render();
 
         choppa.render();
         cannon0.render();
@@ -183,7 +188,8 @@ int main() {
 
         al_flip_display();
 
-        if (choppa.isColided(road) || choppa.isColided(cannon0) || choppa.isColided(cannon1) || choppa.isColided(hospital) || choppa.isColided(ruin) || choppa.isColided(bomba))  {
+        if (choppa.isColided(road) || choppa.isColided(cannon0) || choppa.isColided(cannon1) || choppa.isColided(hospital) || 
+            choppa.isColided(ruin) || choppa.isColided(bomba)|| choppa.isColided(ammo_storage))  {
             break;
         }
 

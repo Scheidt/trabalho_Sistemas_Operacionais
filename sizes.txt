@@ -1,11 +1,17 @@
+choppaX = VARIA
+choppaY = VARIA
 choppa_width = 100;
 choppa_height = 50;
 
+cannonX = VARIA
+cannonY = 500
 cannon_width = 50;
 cannon_height = 50;
 max_ammo = 3;
 reload_time = 0.1;
 
+bombX = VARIA
+bombY= VARIA
 bomb_width = 50;
 bomb_height = 50;
 
@@ -15,6 +21,11 @@ ruinX = 0;
 buildingY = 210;
 building_width = 100;
 building_height = 350;
+
+ammoX = 50;
+ammoY = 500;
+ammo_width = 100;
+ammo_height = 50;
 
 backgroundX = 0;
 backgroundY = 800;
