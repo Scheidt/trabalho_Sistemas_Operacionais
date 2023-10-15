@@ -7,10 +7,7 @@
 // Standart libraries
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
-#include <stdlib.h>
-#include <time.h>
-//
+#include <iostream>
 #include <pthread.h>
 // Allegro includes
 #include <allegro5/allegro.h>
@@ -20,6 +17,7 @@
 
 // Project File
 #include "physics/physics.hpp"
+#include "cannonLogic/cannon.hpp"
 
 #define WIDTH 800
 #define HEIGHT 600

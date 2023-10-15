@@ -2,45 +2,36 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
 
-int hostages_count = 5;
-int bomb_count = 5;
 int hostages_onboard = 1;
+int hostages_count = 5;
 
-
-
-struct Bomb {
-    float x;
-    float y;
-    float vy;  // vertical velocity
-    bool active;  // is the bomb currently moving?
-} bomb;
-
-struct Explosion {
-    float x;
-    float y;
-    bool active;
-} explosion;
+const int max_ammo_const = 3;
+const float reload_time_const = 1/10;
+int vel0X = 0;
+int vel0Y = 0;
+int vel1X = 0;
+int vel1Y = 0;
 
 ALLEGRO_BITMAP *explosion_image = nullptr;
 
-void render_explosion(ALLEGRO_DISPLAY *display, float x, float y) {
-    if (!explosion_image) {
-        explosion_image = al_load_bitmap("assets/test square.png");
-    }
-    al_draw_bitmap(explosion_image, x, y, 0);
+void render_bomb_count(ALLEGRO_DISPLAY *display, int bomb_count, int x, int y) {
+    ALLEGRO_FONT *font = al_create_builtin_font();
+    al_draw_textf(font, al_map_rgb(255, 255, 255), x, y, ALLEGRO_ALIGN_LEFT, "Bombs: %d", bomb_count);
+    al_destroy_font(font);
 }
 
-void render_info(ALLEGRO_DISPLAY *display, int bomb_count, int hostages_count, int hostages_onboard) {
+
+void render_info(ALLEGRO_DISPLAY *display, int hostages_count, int hostages_onboard) {
     ALLEGRO_FONT *font = al_create_builtin_font();
-    al_draw_textf(font, al_map_rgb(255, 255, 255), 50, 50, ALLEGRO_ALIGN_LEFT, "Bombs: %d", bomb_count);
     al_draw_textf(font, al_map_rgb(255, 255, 255), 50, 70, ALLEGRO_ALIGN_LEFT, "Hostages remaining: %d", hostages_count);
     al_draw_textf(font, al_map_rgb(255, 255, 255), 50, 90, ALLEGRO_ALIGN_LEFT, "Hostages onboard: %d", hostages_onboard);
     al_destroy_font(font);
 }
 
 int main() {
-    // Random number seed
+    
     srand((unsigned int)time(NULL));
+
     const int width = WIDTH;
     const int height = HEIGHT;
 
@@ -84,8 +75,6 @@ int main() {
     al_register_event_source(queue, al_get_display_event_source(display));
     al_register_event_source(queue, al_get_timer_event_source(timer));
 
-    bomb = {200, 500, -5.0f, true};
-    explosion = {0, 0, false};
 
     // User input variables
     bool pressed_keys[ALLEGRO_KEY_MAX] = {false};
@@ -100,14 +89,17 @@ int main() {
     int choppaX = 55;
     int choppaY = 55;
     bool right = true;
-    RectangleObject choppa(55, 55, 100, 50, "assets/helicopter.png");
-    RectangleObject cannon0(200, 500, 50, 50, "assets/cannon.png");
-    RectangleObject cannon1(300, 500, 50, 50, "assets/cannon.png");
+    RectangleObject choppa(choppaX, choppaY, 100, 50, "assets/helicopter.png");
+    CannonObject cannon0(200, 500, 50, 50, max_ammo_const, reload_time_const);
+    CannonObject cannon1(300, 500, 50, 50, max_ammo_const, reload_time_const);
     RectangleObject hospital(690, 210, 100, 350, "assets/hospital.png");
     RectangleObject ruin(0, 210, 100, 350, "assets/burnt building.png");
     RectangleObject background(0, 0, 800, 600, "assets/bkground.png");
     RectangleObject road(0, 550, 800, 50, "assets/road.png");
-    RectangleObject bomba(200, 500, 15, 15, "assets/bomb.png");
+    RectangleObject bomba0(400, -100, 15, 15, "assets/bomb.png");
+    RectangleObject bomba1(400, -100, 15, 15, "assets/bomb.png");
+    RectangleObject ammo_storage(50, 500, 100, 50, "assets/ammo_storage.png");
+    RectangleObject explosion(-200, -200, 150, 150, "assets/explosion.png");
 
     while (loop) {
     al_wait_for_event(queue, &event);
@@ -156,61 +148,67 @@ int main() {
             choppa.move(5, 0);
         }
 
-        if (bomb.active) {
-            bomba.move(0, bomb.vy);
-            bomb.y += bomb.vy;
-
-            if (bomb.y <= 0 || choppa.isColided(bomba)) {
-                bomb_count--;
-
-                bomb.active = false;
-                explosion.active = true;
-                explosion.x = bomb.x;
-                explosion.y = bomb.y;
-                last_explosion_time = al_get_time();
-            }
-        }
-
-        if (!bomb.active && !explosion.active && bomb_count > 0) {
-            bomb = {200, 500, -5.0f, true};
-            bomba.setPosition(bomb.x, bomb.y);  // Ensure bomba's position is reset
-        }
-
-        if (explosion.active && al_get_time() - last_explosion_time >= 1.0) {
-            explosion.active = false;
-        }
-
         background.render();
         hospital.render();
         ruin.render();
         road.render();
-        render_info(display, bomb_count, hostages_count, hostages_onboard);
+        ammo_storage.render();
+        render_info(display, hostages_count, hostages_onboard);
         choppa.render();
+
+        // CANHÇAO 0
+        std::pair<int, int> vel_vectors0 = cannon0.update();
         cannon0.render();
+
+        // Access the individual values using .first and .second
+        if ((bomba0.y >= 0) || (vel_vectors0.second == 0)) {
+            // Se a bomba ainda está na tela ou se ela não receber uma velocidade Y
+        } else if (bomba0.y < 0 && vel_vectors0.second != 0){ //Se a bomba está fora da tela e receber uma velocidade diferente de zero
+            vel0X = vel_vectors0.first;
+            vel0Y = vel_vectors0.second;
+            fprintf(stderr, "boom!\n");
+            bomba0.setPosition(((cannon0.x)+25), 450);
+            cannon0.reduceAmmo();
+        }
+        bomba0.move(vel0X, vel0Y);
+        bomba0.render();
+
+        //CANHÃO 1
+        std::pair<int, int> vel_vectors1 = cannon1.update();
         cannon1.render();
 
-        if (bomb.active) {
-            bomba.render();
+        // Access the individual values using .first and .second
+        if ((bomba1.y >= 0) || (vel_vectors1.second == 0)) {
+            // Se a bomba ainda está na tela ou se ela não receber uma velocidade Y
+        } else if (bomba1.y < 0 && vel_vectors1.second != 0){ //Se a bomba está fora da tela e receber uma velocidade diferente de zero
+            vel1X = vel_vectors1.first;
+            vel1Y = vel_vectors1.second;
+            fprintf(stderr, "boom!\n");
+            bomba1.setPosition(((cannon1.x)+25), 450);
+            cannon1.reduceAmmo();
         }
-        if (explosion.active) {
-            render_explosion(display, explosion.x, explosion.y);
+        bomba1.move(vel0X, vel0Y);
+        bomba1.render();
+        if (choppa.isColided(road) || choppa.isColided(cannon0) || choppa.isColided(cannon1) || choppa.isColided(hospital) || 
+                choppa.isColided(ruin) || choppa.isColided(bomba0)|| choppa.isColided(bomba1) || choppa.isColided(ammo_storage))  {
+                explosion.setPosition(choppa.x-40, choppa.y-20);
+                explosion.render();
+                fprintf(stderr, "colided!\n");
         }
 
 
+        render_bomb_count(display, cannon0.ammo, cannon0.x, cannon0.y + 60);  // Adjusted the y coordinate
+        render_bomb_count(display, cannon1.ammo, cannon1.x, cannon1.y + 60);  // Adjusted the y coordinate
+
+        
         al_flip_display();
-
-        if (choppa.isColided(road) || choppa.isColided(cannon0) || choppa.isColided(cannon1) || choppa.isColided(hospital) || choppa.isColided(ruin) || choppa.isColided(bomba))  {
-            break;
-        }
 
         redraw = false;
     }
 }
 
 
-    if (explosion_image) {
-        al_destroy_bitmap(explosion_image);
-    }
+
     al_destroy_font(font);
     al_destroy_display(display);
     al_destroy_timer(timer);
