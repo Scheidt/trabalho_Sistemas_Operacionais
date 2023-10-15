@@ -87,7 +87,7 @@ int main() {
     int choppaX = 55;
     int choppaY = 55;
     bool right = true;
-    RectangleObject choppa(55, 55, 100, 50, "assets/helicopter.png");
+    RectangleObject choppa(choppaX, choppaY, 100, 50, "assets/helicopter.png");
     CannonObject cannon0(200, 500, 50, 50, max_ammo_const, reload_time_const);
     CannonObject cannon1(300, 500, 50, 50, max_ammo_const, reload_time_const);
     RectangleObject hospital(690, 210, 100, 350, "assets/hospital.png");
@@ -97,6 +97,7 @@ int main() {
     RectangleObject bomba0(400, -100, 15, 15, "assets/bomb.png");
     RectangleObject bomba1(400, -100, 15, 15, "assets/bomb.png");
     RectangleObject ammo_storage(50, 500, 100, 50, "assets/ammo_storage.png");
+    RectangleObject explosion(-200, -200, 150, 150, "assets/explosion.png");
 
     while (loop) {
     al_wait_for_event(queue, &event);
@@ -174,11 +175,11 @@ int main() {
         }
         bomba1.move(vel0X, vel0Y);
         bomba1.render();
-
-       if (choppa.isColided(road) || choppa.isColided(cannon0) || choppa.isColided(cannon1) || choppa.isColided(hospital) || 
-            choppa.isColided(ruin) || choppa.isColided(bomba0)|| choppa.isColided(ammo_storage))  {
-            fprintf(stderr, "colided!\n");
-            break;
+        if (choppa.isColided(road) || choppa.isColided(cannon0) || choppa.isColided(cannon1) || choppa.isColided(hospital) || 
+                choppa.isColided(ruin) || choppa.isColided(bomba0)|| choppa.isColided(bomba1) || choppa.isColided(ammo_storage))  {
+                explosion.setPosition(choppa.x-40, choppa.y-20);
+                explosion.render();
+                fprintf(stderr, "colided!\n");
         }
 
 
