@@ -2,8 +2,9 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
 
-const int hostages_count = 0;
-int bomb_count = 5;
+int hostages_onboard = 1;
+int hostages_count = 5;
+
 const int max_ammo_const = 3;
 const float reload_time_const = 1/10;
 int vel0X = 0;
@@ -13,16 +14,17 @@ int vel1Y = 0;
 
 ALLEGRO_BITMAP *explosion_image = nullptr;
 
-void render_explosion(ALLEGRO_DISPLAY *display, float x, float y) {
-    if (!explosion_image) {
-        explosion_image = al_load_bitmap("assets/test square.png");
-    }
-    al_draw_bitmap(explosion_image, x, y, 0);
+void render_bomb_count(ALLEGRO_DISPLAY *display, int bomb_count, int x, int y) {
+    ALLEGRO_FONT *font = al_create_builtin_font();
+    al_draw_textf(font, al_map_rgb(255, 255, 255), x, y, ALLEGRO_ALIGN_LEFT, "Bombs: %d", bomb_count);
+    al_destroy_font(font);
 }
 
-void render_bomb_count(ALLEGRO_DISPLAY *display, int bomb_count) {
+
+void render_info(ALLEGRO_DISPLAY *display, int hostages_count, int hostages_onboard) {
     ALLEGRO_FONT *font = al_create_builtin_font();
-    al_draw_textf(font, al_map_rgb(255, 255, 255), 50, 50, ALLEGRO_ALIGN_LEFT, "Bombs: %d", bomb_count);
+    al_draw_textf(font, al_map_rgb(255, 255, 255), 50, 70, ALLEGRO_ALIGN_LEFT, "Hostages remaining: %d", hostages_count);
+    al_draw_textf(font, al_map_rgb(255, 255, 255), 50, 90, ALLEGRO_ALIGN_LEFT, "Hostages onboard: %d", hostages_onboard);
     al_destroy_font(font);
 }
 
@@ -101,6 +103,7 @@ int main() {
 
     while (loop) {
     al_wait_for_event(queue, &event);
+    
 
     switch (event.type) {
     case ALLEGRO_EVENT_DISPLAY_CLOSE:
@@ -119,6 +122,17 @@ int main() {
         redraw = true;
         break;
     }
+
+
+    if ((choppa.x < ruin.x + ruin.width) && (choppa.y > ruin.y - 80) && hostages_onboard == 0 && hostages_count > 0) {
+        hostages_onboard = 1;
+        hostages_count--;  // Decrease the hostage count when a hostage is picked up
+    }
+
+    if ((choppa.x > hospital.x) && (choppa.y > hospital.y - 80) && hostages_onboard > 0) {
+        hostages_onboard = 0;  // No hostages onboard after dropping off
+    }
+
 
     if (redraw && al_is_event_queue_empty(queue)) {
         if (pressed_keys[ALLEGRO_KEY_DOWN]) {
@@ -139,7 +153,7 @@ int main() {
         ruin.render();
         road.render();
         ammo_storage.render();
-
+        render_info(display, hostages_count, hostages_onboard);
         choppa.render();
 
         // CANHÇAO 0
@@ -183,7 +197,10 @@ int main() {
         }
 
 
-        render_bomb_count(display, cannon0.ammo);
+        render_bomb_count(display, cannon0.ammo, cannon0.x, cannon0.y + 60);  // Adjusted the y coordinate
+        render_bomb_count(display, cannon1.ammo, cannon1.x, cannon1.y + 60);  // Adjusted the y coordinate
+
+        
         al_flip_display();
 
         redraw = false;
