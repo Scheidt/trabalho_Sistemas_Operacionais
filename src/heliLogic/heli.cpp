@@ -15,6 +15,7 @@ HeliObject::HeliObject(
 
 void HeliObject::loop(){
     while(*gameLoop) {
+        sem_wait(sem0);
         if (pressed_keys[ALLEGRO_KEY_DOWN]) { //baixo
             move(0, 5);
         }
@@ -27,7 +28,6 @@ void HeliObject::loop(){
         if (pressed_keys[ALLEGRO_KEY_RIGHT]) {
             move(5, 0);
         }
-        move(velX, velY);
         sem_post(sem1);
     }
   

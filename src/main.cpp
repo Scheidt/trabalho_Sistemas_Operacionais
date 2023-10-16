@@ -31,7 +31,7 @@ void* bombLoop(void* entrada){
 }
 
 void* choppaLoop(void* entrada){
-    BombObject* quaseArgs = (BombObject*) entrada;
+    HeliObject* quaseArgs = (HeliObject*) entrada;
     srand((unsigned int)time(NULL)*(*((int*)(&entrada))));
     quaseArgs -> loop();
     return NULL;
@@ -175,6 +175,7 @@ int main() {
 
     //GAME LOOP
     while (loop) {
+    al_wait_for_event(queue, &event);
     
 
     switch (event.type) {
@@ -195,8 +196,6 @@ int main() {
         break;
     }
     
-    std::cout << "aqui" <<std::endl;
-    std::cout << redraw <<std::endl;
 
     if ((choppa.x < ruin.x + ruin.width) && (choppa.y > ruin.y - 80) && hostages_onboard == 0 && hostages_count > 0) {
         hostages_onboard = 1;
@@ -270,6 +269,7 @@ int main() {
         cannon0.render();
         cannon0.render_bomb_count(display);  // Adjusted the y coordinate
         bomb0.render();
+        std::cout << "3" <<std::endl;
         
         cannon1.render();
         cannon1.render_bomb_count(display);  // Adjusted the y coordinate
