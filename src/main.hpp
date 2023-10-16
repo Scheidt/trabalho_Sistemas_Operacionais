@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <iostream>
 #include <pthread.h>
+#include <time.h>
+#include <semaphore.h>
 // Allegro includes
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
@@ -18,6 +20,7 @@
 // Project File
 #include "physics/physics.hpp"
 #include "cannonLogic/cannon.hpp"
+#include "heliLogic/heli.hpp"
 
 #define WIDTH 800
 #define HEIGHT 600

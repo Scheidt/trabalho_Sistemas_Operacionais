@@ -41,7 +41,7 @@ void RectangleObject::setPosition(float xa, float ya) {
 bool RectangleObject::isColided(RectangleObject& another){
     if(
         x < another.x + another.width &&
-        x + width > another.x &&
+        x + abs(width) > another.x &&
         y < another.y + another.height &&
         y + height > another.y
     ){

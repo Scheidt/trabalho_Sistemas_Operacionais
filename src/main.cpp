@@ -1,9 +1,11 @@
 #include "main.hpp"
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
+#include "Fuse/Fuse.hpp"
+
 
 int hostages_onboard = 1;
-int hostages_count = 5;
+int hostages_count = 9;
 
 const int max_ammo_const = 3;
 const float reload_time_const = 1/10;
@@ -14,12 +16,26 @@ int vel1Y = 0;
 
 ALLEGRO_BITMAP *explosion_image = nullptr;
 
-void render_bomb_count(ALLEGRO_DISPLAY *display, int bomb_count, int x, int y) {
-    ALLEGRO_FONT *font = al_create_builtin_font();
-    al_draw_textf(font, al_map_rgb(255, 255, 255), x, y, ALLEGRO_ALIGN_LEFT, "Bombs: %d", bomb_count);
-    al_destroy_font(font);
+void* cannonLoop(void* entrada){
+    CannonObject* quaseArgs = (CannonObject*) entrada;
+    srand((unsigned int)time(NULL)*(*((int*)(&entrada))));
+    quaseArgs -> loop();
+    return NULL;
 }
 
+void* bombLoop(void* entrada){
+    BombObject* quaseArgs = (BombObject*) entrada;
+    srand((unsigned int)time(NULL)*(*((int*)(&entrada))));
+    quaseArgs -> loop();
+    return NULL;
+}
+
+void* choppaLoop(void* entrada){
+    HeliObject* quaseArgs = (HeliObject*) entrada;
+    srand((unsigned int)time(NULL)*(*((int*)(&entrada))));
+    quaseArgs -> loop();
+    return NULL;
+}
 
 void render_info(ALLEGRO_DISPLAY *display, int hostages_count, int hostages_onboard) {
     ALLEGRO_FONT *font = al_create_builtin_font();
@@ -31,6 +47,7 @@ void render_info(ALLEGRO_DISPLAY *display, int hostages_count, int hostages_onbo
 int main() {
     
     srand((unsigned int)time(NULL));
+
 
     const int width = WIDTH;
     const int height = HEIGHT;
@@ -89,18 +106,73 @@ int main() {
     int choppaX = 55;
     int choppaY = 55;
     bool right = true;
-    RectangleObject choppa(choppaX, choppaY, 100, 50, "assets/helicopter.png");
-    CannonObject cannon0(200, 500, 50, 50, max_ammo_const, reload_time_const);
-    CannonObject cannon1(300, 500, 50, 50, max_ammo_const, reload_time_const);
+
+    bool bridge_full = false;
+    pthread_mutex_t bridge_lock;
+    pthread_mutex_init(&bridge_lock, NULL);
+    //choppa initial info
+    choppaArgs getToTheChoppa = {.right = true, .direction = -1};
+
+    //GET THE CHOPPA
+    sem_t choppa_sem0, choppa_sem1;
+    sem_init(&choppa_sem0, 0, 0);
+    sem_init(&choppa_sem1, 0, 0);
+    HeliObject choppa(choppaX, choppaY, 100, 50, &choppa_sem0, &choppa_sem0, &loop);
+
+    //cannon preparation
+    cannonBombJunction fuseOld0 = {.hasAmmo = false, .bombOutOfBound = false, .cannonX = 0, .cannonY = 0};
+    cannonBombJunction fuseNew0 = {.hasAmmo = false, .bombOutOfBound = false, .cannonX = 0, .cannonY = 0};
+
+    cannonBombJunction fuseOld1 = {.hasAmmo = false, .bombOutOfBound = false, .cannonX = 0, .cannonY = 0} ;   
+    cannonBombJunction fuseNew1 = {.hasAmmo = false, .bombOutOfBound = false, .cannonX = 0, .cannonY = 0};
+
+
+    sem_t bomb0_sem0, bomb0_sem1;
+    sem_t bomb1_sem0, bomb1_sem1;
+    sem_init(&bomb0_sem0, 0, 0);
+    sem_init(&bomb0_sem1, 0, 0);
+    sem_init(&bomb1_sem0, 0, 0);
+    sem_init(&bomb1_sem1, 0, 0);
+    BombObject bomb0(400, -100, 15, 15, 0, 0, &bomb0_sem0, &bomb0_sem1, &fuseNew0, &fuseNew0, &loop, &bridge_lock);
+    BombObject bomb1(400, -100, 15, 15, 0, 0, &bomb1_sem0, &bomb1_sem1, &fuseNew1, &fuseNew1, &loop, &bridge_lock);
+
+    
+
+    sem_t cannon0_sem0, cannon0_sem1;
+    sem_init(&cannon0_sem0, 0, 0);
+    sem_init(&cannon0_sem1, 0, 0);
+    CannonObject cannon0(200, 500, 50, 50, max_ammo_const, reload_time_const, &cannon0_sem0, &cannon0_sem1, &bomb0, &loop, &fuseOld0, &fuseNew0, &bridge_lock, &bridge_full);
+    
+
+    sem_t cannon1_sem0, cannon1_sem1;
+    sem_init(&cannon1_sem0, 0, 0);
+    sem_init(&cannon1_sem1, 0, 0);
+    CannonObject cannon1(300, 500, 50, 50, max_ammo_const, reload_time_const, &cannon1_sem0, &cannon1_sem1, &bomb1, &loop, &fuseOld1, &fuseNew1, &bridge_lock, &bridge_full);
+    
     RectangleObject hospital(690, 210, 100, 350, "assets/hospital.png");
     RectangleObject ruin(0, 210, 100, 350, "assets/burnt building.png");
     RectangleObject background(0, 0, 800, 600, "assets/bkground.png");
     RectangleObject road(0, 550, 800, 50, "assets/road.png");
-    RectangleObject bomba0(400, -100, 15, 15, "assets/bomb.png");
-    RectangleObject bomba1(400, -100, 15, 15, "assets/bomb.png");
     RectangleObject ammo_storage(50, 500, 100, 50, "assets/ammo_storage.png");
     RectangleObject explosion(-200, -200, 150, 150, "assets/explosion.png");
 
+    pthread_t cannon0_thread;
+    pthread_create(&cannon0_thread, NULL, &cannonLoop, (void*) &cannon0);
+
+    pthread_t cannon1_thread;
+    pthread_create(&cannon1_thread, NULL, &cannonLoop, (void*) &cannon1);
+
+    
+    pthread_t bomb0_thread;
+    pthread_create(&bomb0_thread, NULL, &bombLoop, (void*) &bomb0);
+    
+    pthread_t bomb1_thread;
+    pthread_create(&bomb1_thread, NULL, &bombLoop, (void*) &bomb1);
+
+    pthread_t choppa_thread;
+    pthread_create(&choppa_thread, NULL, &bombLoop, (void*) &choppa);
+
+    //GAME LOOP
     while (loop) {
     al_wait_for_event(queue, &event);
     
@@ -135,10 +207,10 @@ int main() {
 
 
     if (redraw && al_is_event_queue_empty(queue)) {
-        if (pressed_keys[ALLEGRO_KEY_DOWN]) {
+        if (pressed_keys[ALLEGRO_KEY_DOWN]) { //baixo
             choppa.move(0, 5);
         }
-        if (pressed_keys[ALLEGRO_KEY_UP]) {
+        if (pressed_keys[ALLEGRO_KEY_UP]) { //cima
             choppa.move(0, -5);
         }
         if (pressed_keys[ALLEGRO_KEY_LEFT]) {
@@ -156,57 +228,103 @@ int main() {
         render_info(display, hostages_count, hostages_onboard);
         choppa.render();
 
-        // CANHÇAO 0
-        std::pair<int, int> vel_vectors0 = cannon0.update();
+
+        sem_post(&cannon0_sem0);
+        sem_post(&cannon1_sem0);
+        sem_post(&bomb0_sem0);
+        sem_post(&bomb1_sem0);
+        sem_post(&choppa_sem0);
+
+
+        sem_wait(&cannon0_sem1);
+        sem_wait(&cannon1_sem1);
+        sem_wait(&bomb0_sem1);
+        sem_wait(&bomb1_sem1);
+        sem_wait(&choppa_sem1);
+        
+        //FLIPPING FUSES FROM CANNON 0 
+        cannonBombJunction flipper {
+            .hasAmmo = fuseOld0.hasAmmo,
+            .bombOutOfBound = fuseOld0.bombOutOfBound,
+            .cannonX = fuseOld0.cannonX,
+            .cannonY = fuseOld0.cannonY
+        };
+
+        fuseOld0.hasAmmo = fuseNew0.hasAmmo;
+        fuseOld0.bombOutOfBound = fuseNew0.bombOutOfBound;
+        fuseOld0.cannonX = fuseNew0.cannonX;
+        fuseOld0.cannonY = fuseNew0.cannonY;
+
+        fuseNew0.hasAmmo = flipper.hasAmmo;
+        fuseNew0.bombOutOfBound = flipper.bombOutOfBound;
+        fuseNew0.cannonX = flipper.cannonX;
+        fuseNew0.cannonY = flipper.cannonY;
+
+        // FLIPPING FUSES FROM CANNON 1
+        flipper.hasAmmo = fuseOld1.hasAmmo;
+        flipper.bombOutOfBound = fuseOld1.bombOutOfBound;
+        flipper.cannonX = fuseOld1.cannonX;
+        flipper.cannonY = fuseOld1.cannonY;
+
+        fuseOld1.hasAmmo = fuseNew1.hasAmmo;
+        fuseOld1.bombOutOfBound = fuseNew1.bombOutOfBound;
+        fuseOld1.cannonX = fuseNew1.cannonX;
+        fuseOld1.cannonY = fuseNew1.cannonY;
+
+        fuseNew1.hasAmmo = flipper.hasAmmo;
+        fuseNew1.bombOutOfBound = flipper.bombOutOfBound;
+        fuseNew1.cannonX = flipper.cannonX;
+        fuseNew1.cannonY = flipper.cannonY;
+
+
         cannon0.render();
-
-        // Access the individual values using .first and .second
-        if ((bomba0.y >= 0) || (vel_vectors0.second == 0)) {
-            // Se a bomba ainda está na tela ou se ela não receber uma velocidade Y
-        } else if (bomba0.y < 0 && vel_vectors0.second != 0){ //Se a bomba está fora da tela e receber uma velocidade diferente de zero
-            vel0X = vel_vectors0.first;
-            vel0Y = vel_vectors0.second;
-            fprintf(stderr, "boom!\n");
-            bomba0.setPosition(((cannon0.x)+25), 450);
-            cannon0.reduceAmmo();
-        }
-        bomba0.move(vel0X, vel0Y);
-        bomba0.render();
-
-        //CANHÃO 1
-        std::pair<int, int> vel_vectors1 = cannon1.update();
+        cannon0.render_bomb_count(display);  // Adjusted the y coordinate
+        bomb0.render();
+        
         cannon1.render();
+        cannon1.render_bomb_count(display);  // Adjusted the y coordinate
+        bomb1.render();
 
-        // Access the individual values using .first and .second
-        if ((bomba1.y >= 0) || (vel_vectors1.second == 0)) {
-            // Se a bomba ainda está na tela ou se ela não receber uma velocidade Y
-        } else if (bomba1.y < 0 && vel_vectors1.second != 0){ //Se a bomba está fora da tela e receber uma velocidade diferente de zero
-            vel1X = vel_vectors1.first;
-            vel1Y = vel_vectors1.second;
-            fprintf(stderr, "boom!\n");
-            bomba1.setPosition(((cannon1.x)+25), 450);
-            cannon1.reduceAmmo();
-        }
-        bomba1.move(vel0X, vel0Y);
-        bomba1.render();
+
         if (choppa.isColided(road) || choppa.isColided(cannon0) || choppa.isColided(cannon1) || choppa.isColided(hospital) || 
-                choppa.isColided(ruin) || choppa.isColided(bomba0)|| choppa.isColided(bomba1) || choppa.isColided(ammo_storage))  {
+                choppa.isColided(ruin) || choppa.isColided(bomb0)|| choppa.isColided(bomb1) || choppa.isColided(ammo_storage))  {
                 explosion.setPosition(choppa.x-40, choppa.y-20);
                 explosion.render();
+                
                 fprintf(stderr, "colided!\n");
         }
-
-
-        render_bomb_count(display, cannon0.ammo, cannon0.x, cannon0.y + 60);  // Adjusted the y coordinate
-        render_bomb_count(display, cannon1.ammo, cannon1.x, cannon1.y + 60);  // Adjusted the y coordinate
 
         
         al_flip_display();
 
+
         redraw = false;
     }
+    //entre um frame e um ciclo de jogo
+
 }
 
+    sem_post(&cannon0_sem0);
+    sem_post(&cannon1_sem0);
+    sem_post(&bomb0_sem0);
+    sem_post(&bomb1_sem0);
+    sem_wait(&choppa_sem1);
+    pthread_join(cannon0_thread, NULL);
+    pthread_join(cannon1_thread, NULL);
+    pthread_join(bomb0_thread, NULL);
+    pthread_join(bomb1_thread, NULL);
+    pthread_join(choppa_thread, NULL);
+    pthread_mutex_destroy(&bridge_lock);
+    sem_destroy(&cannon0_sem0);
+    sem_destroy(&cannon0_sem1);
+    sem_destroy(&cannon1_sem0);
+    sem_destroy(&cannon1_sem1);
+    sem_destroy(&bomb0_sem0);
+    sem_destroy(&bomb0_sem1);
+    sem_destroy(&bomb1_sem0);
+    sem_destroy(&bomb1_sem1);
+    sem_destroy(&choppa_sem0);
+    sem_destroy(&choppa_sem1);
 
 
     al_destroy_font(font);
@@ -214,6 +332,7 @@ int main() {
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
     al_shutdown_font_addon();
+
 
     return 0;
 }
