@@ -30,12 +30,7 @@ void* bombLoop(void* entrada){
     return NULL;
 }
 
-void* choppaLoop(void* entrada){
-    HeliObject* quaseArgs = (HeliObject*) entrada;
-    srand((unsigned int)time(NULL)*(*((int*)(&entrada))));
-    quaseArgs -> loop();
-    return NULL;
-}
+
 
 void render_info(ALLEGRO_DISPLAY *display, int hostages_count, int hostages_onboard) {
     ALLEGRO_FONT *font = al_create_builtin_font();
@@ -111,13 +106,9 @@ int main() {
     pthread_mutex_t bridge_lock;
     pthread_mutex_init(&bridge_lock, NULL);
     //choppa initial info
-    choppaArgs getToTheChoppa = {.right = true, .direction = -1};
 
     //GET THE CHOPPA
-    sem_t choppa_sem0, choppa_sem1;
-    sem_init(&choppa_sem0, 0, 0);
-    sem_init(&choppa_sem1, 0, 0);
-    HeliObject choppa(choppaX, choppaY, 100, 50, &choppa_sem0, &choppa_sem0, &loop);
+    RectangleObject choppa(choppaX, choppaY, 100, 50, "assets/helicopter.png");
 
     //cannon preparation
     cannonBombJunction fuseOld0 = {.hasAmmo = false, .bombOutOfBound = false, .cannonX = 0, .cannonY = 0};
@@ -169,12 +160,22 @@ int main() {
     pthread_t bomb1_thread;
     pthread_create(&bomb1_thread, NULL, &bombLoop, (void*) &bomb1);
 
-    pthread_t choppa_thread;
-    pthread_create(&choppa_thread, NULL, &bombLoop, (void*) &choppa);
 
     //GAME LOOP
     while (loop) {
     al_wait_for_event(queue, &event);
+        if (pressed_keys[ALLEGRO_KEY_DOWN]) { //baixo
+            choppa.move(0, 5);
+        }
+        if (pressed_keys[ALLEGRO_KEY_UP]) { //cima
+            choppa.move(0, -5);
+        }
+        if (pressed_keys[ALLEGRO_KEY_LEFT]) {
+            choppa.move(-5, 0);
+        }
+        if (pressed_keys[ALLEGRO_KEY_RIGHT]) {
+            choppa.move(5, 0);
+        }
     
 
     switch (event.type) {
@@ -207,18 +208,6 @@ int main() {
 
 
     if (redraw && al_is_event_queue_empty(queue)) {
-        if (pressed_keys[ALLEGRO_KEY_DOWN]) { //baixo
-            choppa.move(0, 5);
-        }
-        if (pressed_keys[ALLEGRO_KEY_UP]) { //cima
-            choppa.move(0, -5);
-        }
-        if (pressed_keys[ALLEGRO_KEY_LEFT]) {
-            choppa.move(-5, 0);
-        }
-        if (pressed_keys[ALLEGRO_KEY_RIGHT]) {
-            choppa.move(5, 0);
-        }
 
         background.render();
         hospital.render();
@@ -233,14 +222,12 @@ int main() {
         sem_post(&cannon1_sem0);
         sem_post(&bomb0_sem0);
         sem_post(&bomb1_sem0);
-        sem_post(&choppa_sem0);
 
 
         sem_wait(&cannon0_sem1);
         sem_wait(&cannon1_sem1);
         sem_wait(&bomb0_sem1);
         sem_wait(&bomb1_sem1);
-        sem_wait(&choppa_sem1);
         
         //FLIPPING FUSES FROM CANNON 0 
         cannonBombJunction flipper {
@@ -287,7 +274,8 @@ int main() {
 
 
         if (choppa.isColided(road) || choppa.isColided(cannon0) || choppa.isColided(cannon1) || choppa.isColided(hospital) || 
-                choppa.isColided(ruin) || choppa.isColided(bomb0)|| choppa.isColided(bomb1) || choppa.isColided(ammo_storage))  {
+                choppa.isColided(ruin) || choppa.isColided(bomb0)|| choppa.isColided(bomb1) || choppa.isColided(ammo_storage)
+                || choppa.y < 0) {
                 explosion.setPosition(choppa.x-40, choppa.y-20);
                 explosion.render();
                 
@@ -301,19 +289,17 @@ int main() {
         redraw = false;
     }
     //entre um frame e um ciclo de jogo
-
+    
 }
 
     sem_post(&cannon0_sem0);
     sem_post(&cannon1_sem0);
     sem_post(&bomb0_sem0);
     sem_post(&bomb1_sem0);
-    sem_wait(&choppa_sem1);
     pthread_join(cannon0_thread, NULL);
     pthread_join(cannon1_thread, NULL);
     pthread_join(bomb0_thread, NULL);
     pthread_join(bomb1_thread, NULL);
-    pthread_join(choppa_thread, NULL);
     pthread_mutex_destroy(&bridge_lock);
     sem_destroy(&cannon0_sem0);
     sem_destroy(&cannon0_sem1);
@@ -323,8 +309,6 @@ int main() {
     sem_destroy(&bomb0_sem1);
     sem_destroy(&bomb1_sem0);
     sem_destroy(&bomb1_sem1);
-    sem_destroy(&choppa_sem0);
-    sem_destroy(&choppa_sem1);
 
 
     al_destroy_font(font);

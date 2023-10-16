@@ -12,6 +12,7 @@ public:
     sem_t* sem0;
     sem_t* sem1;
     bool* gameLoop;
+    bool* pressed_keys [277];
 
     HeliObject(
         int xa,
@@ -20,7 +21,8 @@ public:
         int h,
         sem_t* sem0a,
         sem_t* sem1a,
-        bool* gameLoopa
+        bool* gameLoopa,
+        bool pressed_keysA [277]
     );
     void loop();
 };

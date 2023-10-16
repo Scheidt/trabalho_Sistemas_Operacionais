@@ -20,7 +20,6 @@
 // Project File
 #include "physics/physics.hpp"
 #include "cannonLogic/cannon.hpp"
-#include "heliLogic/heli.hpp"
 
 #define WIDTH 800
 #define HEIGHT 600
