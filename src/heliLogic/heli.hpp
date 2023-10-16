@@ -13,6 +13,7 @@ public:
     sem_t* sem1;
     bool* gameLoop;
     bool* pressed_keys;
+    bool right;
 
     HeliObject(
         int xa,
