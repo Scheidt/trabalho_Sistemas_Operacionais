@@ -30,6 +30,12 @@ void* bombLoop(void* entrada){
     return NULL;
 }
 
+void* choppaLoop(void* entrada){
+    BombObject* quaseArgs = (BombObject*) entrada;
+    srand((unsigned int)time(NULL)*(*((int*)(&entrada))));
+    quaseArgs -> loop();
+    return NULL;
+}
 
 
 void render_info(ALLEGRO_DISPLAY *display, int hostages_count, int hostages_onboard) {
@@ -108,13 +114,16 @@ int main() {
     //choppa initial info
 
     //GET THE CHOPPA
-    RectangleObject choppa(choppaX, choppaY, 100, 50, "assets/helicopter.png");
+    sem_t choppa_sem0, choppa_sem1;
+    sem_init(&choppa_sem0, 0, 0);
+    sem_init(&choppa_sem1, 0, 0);
+    HeliObject choppa(choppaX, choppaY, 100, 50, &choppa_sem0, &choppa_sem1, &loop, pressed_keys);
 
     //cannon preparation
     cannonBombJunction fuseOld0 = {.hasAmmo = false, .bombOutOfBound = false, .cannonX = 0, .cannonY = 0};
     cannonBombJunction fuseNew0 = {.hasAmmo = false, .bombOutOfBound = false, .cannonX = 0, .cannonY = 0};
 
-    cannonBombJunction fuseOld1 = {.hasAmmo = false, .bombOutOfBound = false, .cannonX = 0, .cannonY = 0} ;   
+    cannonBombJunction fuseOld1 = {.hasAmmo = false, .bombOutOfBound = false, .cannonX = 0, .cannonY = 0};   
     cannonBombJunction fuseNew1 = {.hasAmmo = false, .bombOutOfBound = false, .cannonX = 0, .cannonY = 0};
 
 
@@ -147,6 +156,9 @@ int main() {
     RectangleObject ammo_storage(50, 500, 100, 50, "assets/ammo_storage.png");
     RectangleObject explosion(-200, -200, 150, 150, "assets/explosion.png");
 
+    pthread_t choppa_thread;
+    pthread_create(&choppa_thread, NULL, &choppaLoop, (void*) &choppa);
+    
     pthread_t cannon0_thread;
     pthread_create(&cannon0_thread, NULL, &cannonLoop, (void*) &cannon0);
 
@@ -163,19 +175,6 @@ int main() {
 
     //GAME LOOP
     while (loop) {
-    al_wait_for_event(queue, &event);
-        if (pressed_keys[ALLEGRO_KEY_DOWN]) { //baixo
-            choppa.move(0, 5);
-        }
-        if (pressed_keys[ALLEGRO_KEY_UP]) { //cima
-            choppa.move(0, -5);
-        }
-        if (pressed_keys[ALLEGRO_KEY_LEFT]) {
-            choppa.move(-5, 0);
-        }
-        if (pressed_keys[ALLEGRO_KEY_RIGHT]) {
-            choppa.move(5, 0);
-        }
     
 
     switch (event.type) {
@@ -195,7 +194,9 @@ int main() {
         redraw = true;
         break;
     }
-
+    
+    std::cout << "aqui" <<std::endl;
+    std::cout << redraw <<std::endl;
 
     if ((choppa.x < ruin.x + ruin.width) && (choppa.y > ruin.y - 80) && hostages_onboard == 0 && hostages_count > 0) {
         hostages_onboard = 1;
@@ -222,12 +223,14 @@ int main() {
         sem_post(&cannon1_sem0);
         sem_post(&bomb0_sem0);
         sem_post(&bomb1_sem0);
+        sem_post(&choppa_sem0);
 
 
         sem_wait(&cannon0_sem1);
         sem_wait(&cannon1_sem1);
         sem_wait(&bomb0_sem1);
         sem_wait(&bomb1_sem1);
+        sem_wait(&choppa_sem1);
         
         //FLIPPING FUSES FROM CANNON 0 
         cannonBombJunction flipper {
@@ -296,10 +299,12 @@ int main() {
     sem_post(&cannon1_sem0);
     sem_post(&bomb0_sem0);
     sem_post(&bomb1_sem0);
+    sem_post(&choppa_sem0);
     pthread_join(cannon0_thread, NULL);
     pthread_join(cannon1_thread, NULL);
     pthread_join(bomb0_thread, NULL);
     pthread_join(bomb1_thread, NULL);
+    pthread_join(choppa_thread, NULL);
     pthread_mutex_destroy(&bridge_lock);
     sem_destroy(&cannon0_sem0);
     sem_destroy(&cannon0_sem1);
@@ -309,6 +314,8 @@ int main() {
     sem_destroy(&bomb0_sem1);
     sem_destroy(&bomb1_sem0);
     sem_destroy(&bomb1_sem1);
+    sem_destroy(&choppa_sem0);
+    sem_destroy(&choppa_sem1);
 
 
     al_destroy_font(font);

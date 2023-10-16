@@ -12,7 +12,7 @@ public:
     sem_t* sem0;
     sem_t* sem1;
     bool* gameLoop;
-    bool* pressed_keys [277];
+    bool* pressed_keys;
 
     HeliObject(
         int xa,
