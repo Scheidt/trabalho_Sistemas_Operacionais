@@ -6,8 +6,8 @@ CannonObject::CannonObject(
     int ya,
     int w,
     int h,
-    int max_ammo,
-    float reload_time,
+    unsigned int max_ammo,
+    unsigned int reload_time,
     sem_t* sem0A,
     sem_t* sem1A,
     BombObject* bombA,
@@ -24,7 +24,7 @@ CannonObject::CannonObject(
 
 void CannonObject::update() {
     if ((ammo <= 0) && (x == 50)) {
-        Sleep(reload_time);
+        framesTilReload = reload_time;
         ammo = max_ammo;
     }
     if ((ammo <= 0) && (x > 51)) {
@@ -84,7 +84,12 @@ void CannonObject::render_bomb_count(ALLEGRO_DISPLAY* display) {
 void CannonObject::loop(){
     while(*gameLoop) {
         sem_wait(sem0);
-        update();
+        if (framesTilReload > 0){
+            std::cout<<framesTilReload<<std::endl;
+            framesTilReload --;
+        } else if (framesTilReload == 0)  {
+            update();
+        }
         if (ammo > 0){
             fuseNew->hasAmmo = true;
             fuseNew->cannonX = x;

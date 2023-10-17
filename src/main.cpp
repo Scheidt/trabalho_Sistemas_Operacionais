@@ -1,20 +1,18 @@
 #include "main.hpp"
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_primitives.h>
-#include "Fuse/Fuse.hpp"
 
 
 int hostages_onboard = 1;
-int hostages_count = 9;
+int hostages_count = 2;
 
-const int max_ammo_const = 3;
-const float reload_time_const = 1/10;
+unsigned int max_ammo = 3;
+unsigned int reload_time = 1000000; //dado em frames (1/60 de segundo)
+
 int vel0X = 0;
 int vel0Y = 0;
 int vel1X = 0;
 int vel1Y = 0;
+bool won = false;
 
-ALLEGRO_BITMAP *explosion_image = nullptr;
 
 void* cannonLoop(void* entrada){
     CannonObject* quaseArgs = (CannonObject*) entrada;
@@ -76,6 +74,11 @@ int main() {
         return -1;
     }
 
+    if (!al_init_ttf_addon()) {
+        fprintf(stderr, "Failed to initialize Allegro Tff Addon!\n");
+        return -1;
+    }
+
     // Allegro Variables
     ALLEGRO_DISPLAY* display = al_create_display(width, height);
     ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
@@ -87,6 +90,11 @@ int main() {
         fprintf(stderr, "Failed to create display!\n");
         return -1;
     }
+    
+    if (!font) {
+        fprintf(stderr, "Failed to load font.\n");
+        return -1;
+    }
 
     // Allegro - registering event sources
     al_register_event_source(queue, al_get_keyboard_event_source());
@@ -94,19 +102,73 @@ int main() {
     al_register_event_source(queue, al_get_timer_event_source(timer));
 
 
-    // User input variables
-    bool pressed_keys[ALLEGRO_KEY_MAX] = {false};
+    //seleção de dificuldade
+    const char* difficultyOptions[] = { "Easy", "Medium", "Hard" };
+    int selectedDifficulty = 0;
+
+    while (1) {
+        al_clear_to_color(al_map_rgb(0, 0, 0));
+        
+        for (int i = 0; i < 3; i++) {
+            if (i == selectedDifficulty) {
+                al_draw_text(font, al_map_rgb(255, 255, 255), 400, 200 + 50 * i, ALLEGRO_ALIGN_CENTRE, difficultyOptions[i]);
+            }
+            else {
+                al_draw_text(font, al_map_rgb(100, 100, 100), 400, 200 + 50 * i, ALLEGRO_ALIGN_CENTRE, difficultyOptions[i]);
+            }
+        }
+
+        al_flip_display();
+
+        ALLEGRO_EVENT ev;
+        al_wait_for_event(queue, &ev);
+
+        if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
+            if (ev.keyboard.keycode == ALLEGRO_KEY_UP) {
+                selectedDifficulty = (selectedDifficulty - 1 + 3) % 3;
+            }
+            else if (ev.keyboard.keycode == ALLEGRO_KEY_DOWN) {
+                selectedDifficulty = (selectedDifficulty + 1) % 3;
+            }
+            else if (ev.keyboard.keycode == ALLEGRO_KEY_ENTER) {
+                // User pressed Enter, perform an action based on selectedDifficulty
+                switch (selectedDifficulty) {
+                    case 0: // EASY
+                        max_ammo = 3;
+                        reload_time = 60; // 1 second (time given in frames)
+                        break;
+                    case 1: // MEDIUM
+                        max_ammo = 5;
+                        reload_time = 30; // 1/2 second (time given in frames)
+                        break;
+                    case 2: // HARD
+                        max_ammo = 7;
+                        reload_time = 15; // 1/4 second (time given in frames)
+                        break;
+                }
+                break;
+            }
+            else if (ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
+                // User pressed Esc key, close the program
+                return 0;
+            }
+        }
+        else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+            return 0;
+        }
+    }
 
     // Loop variables
     al_start_timer(timer);
 
     bool redraw = true;
     bool loop = true;
-    double last_explosion_time = 0;
 
     int choppaX = 55;
     int choppaY = 55;
     bool right = true;
+
+    bool pressed_keys[ALLEGRO_KEY_MAX] = {false};
 
     bool bridge_full = false;
     pthread_mutex_t bridge_lock;
@@ -141,13 +203,13 @@ int main() {
     sem_t cannon0_sem0, cannon0_sem1;
     sem_init(&cannon0_sem0, 0, 0);
     sem_init(&cannon0_sem1, 0, 0);
-    CannonObject cannon0(200, 500, 50, 50, max_ammo_const, reload_time_const, &cannon0_sem0, &cannon0_sem1, &bomb0, &loop, &fuseOld0, &fuseNew0, &bridge_lock, &bridge_full);
+    CannonObject cannon0(200, 500, 50, 50, max_ammo, reload_time, &cannon0_sem0, &cannon0_sem1, &bomb0, &loop, &fuseOld0, &fuseNew0, &bridge_lock, &bridge_full);
     
 
     sem_t cannon1_sem0, cannon1_sem1;
     sem_init(&cannon1_sem0, 0, 0);
     sem_init(&cannon1_sem1, 0, 0);
-    CannonObject cannon1(300, 500, 50, 50, max_ammo_const, reload_time_const, &cannon1_sem0, &cannon1_sem1, &bomb1, &loop, &fuseOld1, &fuseNew1, &bridge_lock, &bridge_full);
+    CannonObject cannon1(300, 500, 50, 50, max_ammo, reload_time, &cannon1_sem0, &cannon1_sem1, &bomb1, &loop, &fuseOld1, &fuseNew1, &bridge_lock, &bridge_full);
     
     RectangleObject hospital(690, 210, 100, 350, "assets/hospital.png");
     RectangleObject ruin(0, 210, 100, 350, "assets/burnt building.png");
@@ -155,6 +217,8 @@ int main() {
     RectangleObject road(0, 550, 800, 50, "assets/road.png");
     RectangleObject ammo_storage(50, 500, 100, 50, "assets/ammo_storage.png");
     RectangleObject explosion(-200, -200, 150, 150, "assets/explosion.png");
+    RectangleObject game_over(0, 0, 800, 600, "assets/game over screen.jpg");
+    RectangleObject win_screen(0, 0, 800, 600, "assets/win screen.jpg");
 
     pthread_t choppa_thread;
     pthread_create(&choppa_thread, NULL, &choppaLoop, (void*) &choppa);
@@ -197,13 +261,13 @@ int main() {
     }
     
 
-    if ((choppa.x < ruin.x + ruin.width) && (choppa.y > ruin.y - 80) && hostages_onboard == 0 && hostages_count > 0) {
+    if ((choppa.x < ruin.x + ruin.width) && (choppa.y > ruin.y - 80) && hostages_onboard == 0 && hostages_count > 0) { // Got a hostage
         hostages_onboard = 1;
-        hostages_count--;  // Decrease the hostage count when a hostage is picked up
+        hostages_count--;
     }
 
-    if ((choppa.x > hospital.x) && (choppa.y > hospital.y - 80) && hostages_onboard > 0) {
-        hostages_onboard = 0;  // No hostages onboard after dropping off
+    if ((choppa.x > hospital.x) && (choppa.y > hospital.y - 80) && hostages_onboard > 0) { // delivered a hostage
+        hostages_onboard = 0;
     }
 
 
@@ -269,7 +333,6 @@ int main() {
         cannon0.render();
         cannon0.render_bomb_count(display);  // Adjusted the y coordinate
         bomb0.render();
-        std::cout << "3" <<std::endl;
         
         cannon1.render();
         cannon1.render_bomb_count(display);  // Adjusted the y coordinate
@@ -281,8 +344,11 @@ int main() {
                 || choppa.y < 0) {
                 explosion.setPosition(choppa.x-40, choppa.y-20);
                 explosion.render();
-                
-                fprintf(stderr, "colided!\n");
+                loop = false;
+        }
+        if (hostages_count == 0 && hostages_onboard == 0){
+            won = true;
+            loop = false;
         }
 
         
@@ -294,6 +360,16 @@ int main() {
     //entre um frame e um ciclo de jogo
     
 }
+    al_rest(2.0);
+    if (won){
+        win_screen.render();
+    } else {
+    game_over.render();
+
+    }
+    al_flip_display();
+    al_rest(3.0);
+
 
     sem_post(&cannon0_sem0);
     sem_post(&cannon1_sem0);
