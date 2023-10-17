@@ -24,12 +24,32 @@ void HeliObject::loop(){
         }
         if (pressed_keys[ALLEGRO_KEY_LEFT]) {
             move(-5, 0);
+            right = false;
         }
         if (pressed_keys[ALLEGRO_KEY_RIGHT]) {
             move(5, 0);
+            right = true;
         }
         sem_post(sem1);
     }
-  
+}
 
+void HeliObject::render(){
+    if (!right){
+        al_draw_scaled_bitmap(
+            sprite.image, 
+            0, 0, 
+            (float)sprite.width, (float)sprite.height,
+            x, y, 
+            width, height, 0
+        );
+    } else {
+        al_draw_scaled_bitmap(
+            sprite.image, 
+            0, 0, 
+            (float)sprite.width, (float)sprite.height,
+            x+100, y, 
+            -width, height, 0
+        );
+    }
 }

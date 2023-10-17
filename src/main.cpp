@@ -1,18 +1,6 @@
 #include "main.hpp"
 
 
-int hostages_onboard = 1;
-int hostages_count = 2;
-
-unsigned int max_ammo = 3;
-unsigned int reload_time = 1000000; //dado em frames (1/60 de segundo)
-
-int vel0X = 0;
-int vel0Y = 0;
-int vel1X = 0;
-int vel1Y = 0;
-bool won = false;
-
 
 void* cannonLoop(void* entrada){
     CannonObject* quaseArgs = (CannonObject*) entrada;
@@ -44,6 +32,13 @@ void render_info(ALLEGRO_DISPLAY *display, int hostages_count, int hostages_onbo
 }
 
 int main() {
+    int hostages_onboard = 1;
+    int hostages_count = 9;
+
+    unsigned int max_ammo = 3;
+    unsigned int reload_time = 1000000; //dado em frames (1/60 de segundo)
+
+    bool won = false;
     
     srand((unsigned int)time(NULL));
 
@@ -266,7 +261,7 @@ int main() {
         hostages_count--;
     }
 
-    if ((choppa.x > hospital.x) && (choppa.y > hospital.y - 80) && hostages_onboard > 0) { // delivered a hostage
+    if ((choppa.x > hospital.x-20) && (choppa.y > hospital.y - 80) && hostages_onboard > 0) { // delivered a hostage
         hostages_onboard = 0;
     }
 

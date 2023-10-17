@@ -26,6 +26,7 @@ public:
         bool pressed_keysA [277]
     );
     void loop();
+    void render();
 };
 
 typedef struct choppaArgs {

@@ -85,7 +85,6 @@ void CannonObject::loop(){
     while(*gameLoop) {
         sem_wait(sem0);
         if (framesTilReload > 0){
-            std::cout<<framesTilReload<<std::endl;
             framesTilReload --;
         } else if (framesTilReload == 0)  {
             update();
