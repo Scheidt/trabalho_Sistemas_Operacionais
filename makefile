@@ -62,11 +62,13 @@ $(BUILD_DIR)\\%.o: $(SRC_DIR)\%.cpp
 build: $(TARGET)
 
 run:
-	./$(TARGET)
+	@echo running $(TARGET)
+	@./$(TARGET)
 
 clean:
 	@echo deleting... $(O_FILES)
 	@$(RM_COMMAND) $(O_FILES) $(TARGET)
+	@clear
 
 test:
 	@echo $(OS)
