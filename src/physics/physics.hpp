@@ -19,9 +19,9 @@ class RectangleObject{
         float height;
         Sprite sprite;
 
-        RectangleObject(float xa, float ya, float w, float h, char* path);
+        RectangleObject(float xa, float ya, float w, float h, const char* path);
         void render();
-        void move(int xa, int ya);
+        void move(float xa, float ya);
         void setPosition(float x, float y);
         bool isColided(RectangleObject& another);
 };

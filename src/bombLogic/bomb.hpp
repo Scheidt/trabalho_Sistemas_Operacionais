@@ -9,8 +9,8 @@
 
 class BombObject : public RectangleObject {
 public:
-    int velX;
-    int velY;
+    float velX;
+    float velY;
     sem_t* sem0;
     sem_t* sem1;
     cannonBombJunction* fuseNew;
@@ -19,12 +19,12 @@ public:
     pthread_mutex_t* bridge_lock;
 
     BombObject(
-        int xa,
-        int ya,
-        int w,
-        int h,
-        int velXa,
-        int velYa,
+        float xa,
+        float ya,
+        float w,
+        float h,
+        float velXa,
+        float velYa,
         sem_t* sem0a,
         sem_t* sem1a,
         cannonBombJunction* fuseNewa,
@@ -35,3 +35,5 @@ public:
     void shoot();
     void loop();
 };
+
+void* bombLoop(void* entrada);

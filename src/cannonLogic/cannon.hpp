@@ -30,10 +30,10 @@ public:
     bool am_in_bridge = false;
 
     CannonObject(
-        int xa,
-        int ya,
-        int w,
-        int h,
+        float xa,
+        float ya,
+        float w,
+        float h,
         unsigned int max_ammo,
         unsigned int reload_time,
         sem_t* sem0A,
@@ -47,9 +47,11 @@ public:
     );
     void update();
     void loop();
-    void render_bomb_count(ALLEGRO_DISPLAY* display);
+    void render_bomb_count();
     void* sleepThread(void* arg);
 };
+
+void* cannonLoop(void* entrada);
 
 
 #endif

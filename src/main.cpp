@@ -1,30 +1,6 @@
 #include "main.hpp"
 
-
-
-void* cannonLoop(void* entrada){
-    CannonObject* quaseArgs = (CannonObject*) entrada;
-    srand((unsigned int)time(NULL)*(*((int*)(&entrada))));
-    quaseArgs -> loop();
-    return NULL;
-}
-
-void* bombLoop(void* entrada){
-    BombObject* quaseArgs = (BombObject*) entrada;
-    srand((unsigned int)time(NULL)*(*((int*)(&entrada))));
-    quaseArgs -> loop();
-    return NULL;
-}
-
-void* choppaLoop(void* entrada){
-    HeliObject* quaseArgs = (HeliObject*) entrada;
-    srand((unsigned int)time(NULL)*(*((int*)(&entrada))));
-    quaseArgs -> loop();
-    return NULL;
-}
-
-
-void render_info(ALLEGRO_DISPLAY *display, int hostages_count, int hostages_onboard) {
+void render_info(int hostages_count, int hostages_onboard) {
     ALLEGRO_FONT *font = al_create_builtin_font();
     al_draw_textf(font, al_map_rgb(255, 255, 255), 50, 70, ALLEGRO_ALIGN_LEFT, "Hostages remaining: %d", hostages_count);
     al_draw_textf(font, al_map_rgb(255, 255, 255), 50, 90, ALLEGRO_ALIGN_LEFT, "Hostages onboard: %d", hostages_onboard);
@@ -63,12 +39,10 @@ int main() {
         fprintf(stderr, "Failed to initialize Allegro Primitives!\n");
         return -1;
     };
-
     if (!al_init_font_addon()) {
         fprintf(stderr, "Failed to initialize Allegro Font Addon!\n");
         return -1;
     }
-
     if (!al_init_ttf_addon()) {
         fprintf(stderr, "Failed to initialize Allegro Tff Addon!\n");
         return -1;
@@ -106,10 +80,10 @@ int main() {
         
         for (int i = 0; i < 3; i++) {
             if (i == selectedDifficulty) {
-                al_draw_text(font, al_map_rgb(255, 255, 255), 400, 200 + 50 * i, ALLEGRO_ALIGN_CENTRE, difficultyOptions[i]);
+                al_draw_text(font, al_map_rgb(255, 255, 255), 400, (float)(200 + 50 * i), ALLEGRO_ALIGN_CENTRE, difficultyOptions[i]);
             }
             else {
-                al_draw_text(font, al_map_rgb(100, 100, 100), 400, 200 + 50 * i, ALLEGRO_ALIGN_CENTRE, difficultyOptions[i]);
+                al_draw_text(font, al_map_rgb(100, 100, 100), 400, (float)(200 + 50 * i), ALLEGRO_ALIGN_CENTRE, difficultyOptions[i]);
             }
         }
 
@@ -159,9 +133,8 @@ int main() {
     bool redraw = true;
     bool loop = true;
 
-    int choppaX = 55;
-    int choppaY = 55;
-    bool right = true;
+    float choppaX = 55;
+    float choppaY = 55;
 
     bool pressed_keys[ALLEGRO_KEY_MAX] = {false};
 
@@ -273,7 +246,7 @@ int main() {
         ruin.render();
         road.render();
         ammo_storage.render();
-        render_info(display, hostages_count, hostages_onboard);
+        render_info(hostages_count, hostages_onboard);
         choppa.render();
 
 
@@ -326,11 +299,11 @@ int main() {
 
 
         cannon0.render();
-        cannon0.render_bomb_count(display);  // Adjusted the y coordinate
+        cannon0.render_bomb_count();  // Adjusted the y coordinate
         bomb0.render();
         
         cannon1.render();
-        cannon1.render_bomb_count(display);  // Adjusted the y coordinate
+        cannon1.render_bomb_count();  // Adjusted the y coordinate
         bomb1.render();
 
 

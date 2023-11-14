@@ -1,13 +1,12 @@
 #include "cannon.hpp"
 
-
 CannonObject::CannonObject(
-    int xa,
-    int ya,
-    int w,
-    int h,
-    unsigned int max_ammo,
-    unsigned int reload_time,
+    float xa,
+    float ya,
+    float w,
+    float h,
+    unsigned int max_ammoA,
+    unsigned int reload_timeA,
     sem_t* sem0A,
     sem_t* sem1A,
     BombObject* bombA,
@@ -16,11 +15,19 @@ CannonObject::CannonObject(
     cannonBombJunction* fuseNewA,
     pthread_mutex_t* bridge_lockA,
     bool* bridge_occupiedA
-
-) : RectangleObject(xa, ya, w, h, "assets/cannon.png"), max_ammo(max_ammo), reload_time(reload_time), ammo(max_ammo), 
-    sem0(sem0A), sem1(sem1A), bomb(bombA), gameLoop(gameLoopA), fuseOld(fuseOldA), fuseNew(fuseNewA), bridge_lock(bridge_lockA),
-    bridge_occupied(bridge_occupiedA){};
-
+) : RectangleObject(xa, ya, w, h, "assets/cannon.png"),
+    ammo(max_ammoA),
+    max_ammo(max_ammoA),
+    reload_time(reload_timeA),
+    sem0(sem0A),
+    sem1(sem1A),
+    bomb(bombA),
+    gameLoop(gameLoopA),
+    fuseOld(fuseOldA),
+    fuseNew(fuseNewA),
+    bridge_lock(bridge_lockA),
+    bridge_occupied(bridge_occupiedA){
+};
 
 void CannonObject::update() {
     if ((ammo <= 0) && (x == 50)) {
@@ -74,8 +81,7 @@ void CannonObject::update() {
     }
 }
 
-
-void CannonObject::render_bomb_count(ALLEGRO_DISPLAY* display) {
+void CannonObject::render_bomb_count() {
     ALLEGRO_FONT *font = al_create_builtin_font();
     al_draw_textf(font, al_map_rgb(255, 255, 255), x, y+60, ALLEGRO_ALIGN_LEFT, "Bombs: %d", ammo);
     al_destroy_font(font);
@@ -102,4 +108,13 @@ void CannonObject::loop(){
         sem_post(sem1);
     }
 }
-//reduceAmmo()
+
+void* cannonLoop(void* entrada){
+    CannonObject* quaseArgs = (CannonObject*) entrada;
+
+    const unsigned int* seed = (unsigned int*)(&entrada);
+    srand(((unsigned int)time(NULL))*(*seed));
+    
+    quaseArgs -> loop();
+    return NULL;
+}

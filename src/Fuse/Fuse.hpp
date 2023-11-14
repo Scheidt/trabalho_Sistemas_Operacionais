@@ -7,9 +7,9 @@
 typedef struct {
     bool hasAmmo;
     bool bombOutOfBound;
-    int cannonX;
-    int cannonY;
-    } cannonBombJunction;
+    float cannonX;
+    float cannonY;
+} cannonBombJunction;
 
 
 #endif

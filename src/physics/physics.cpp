@@ -1,11 +1,12 @@
 #include "physics.hpp"
+#include <string.h>
 
 RectangleObject::RectangleObject(
     float xa, 
     float ya, 
     float w, 
     float h, 
-    char* path
+    const char* path
 ):x(xa), y(ya), width(w), height(h){ // x = xa, y = ya
     sprite.image = al_load_bitmap(path);
     if(!sprite.image){
@@ -27,7 +28,7 @@ void RectangleObject::render(){
     );
 }
 
-void RectangleObject::move(int xa, int ya){
+void RectangleObject::move(float xa, float ya){
     x = x + xa;
     y = y + ya;
 }

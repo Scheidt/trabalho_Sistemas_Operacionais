@@ -2,16 +2,21 @@
 
 
 HeliObject::HeliObject(
-    int xa,
-    int ya,
-    int w,
-    int h,
+    float xa,
+    float ya,
+    float w,
+    float h,
     sem_t* sem0a,
     sem_t* sem1a,
     bool* gameLoopA,
     bool pressed_keysA [277]
+) : RectangleObject(xa, ya, w, h, "assets/helicopter.png"),
+    sem0(sem0a),
+    sem1(sem1a),
+    gameLoop(gameLoopA),
+    pressed_keys(pressed_keysA) {
 
-) : RectangleObject(xa, ya, w, h, "assets/helicopter.png"), sem0(sem0a), sem1(sem1a), gameLoop(gameLoopA), pressed_keys(pressed_keysA) {};
+};
 
 void HeliObject::loop(){
     while(*gameLoop) {
@@ -52,4 +57,14 @@ void HeliObject::render(){
             -width, height, 0
         );
     }
+}
+
+void* choppaLoop(void* entrada){
+    HeliObject* quaseArgs = (HeliObject*) entrada;
+
+    const unsigned int* seed = (unsigned int*)(&entrada);
+    srand((unsigned int)time(NULL)*(*seed));
+
+    quaseArgs -> loop();
+    return NULL;
 }

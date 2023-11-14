@@ -2,12 +2,12 @@
 
 
 BombObject::BombObject(
-    int xa,
-    int ya,
-    int w,
-    int h,
-    int velXa,
-    int velYa,
+    float xa,
+    float ya,
+    float w,
+    float h,
+    float velXa,
+    float velYa,
     sem_t* sem0a,
     sem_t* sem1a,
     cannonBombJunction* fuseNewa,
@@ -35,6 +35,16 @@ void BombObject::loop(){
 }
 
 void BombObject::shoot(){
-    velX = (rand() % 3) * ((rand() % 2) * 2 - 1); //0~3 * 50% de chance de ser positivo ou negativo
-    velY = ((rand() % 5) + 2) * (-1);
+    velX = (float)((rand() % 3) * ((rand() % 2) * 2 - 1)); //0~3 * 50% de chance de ser positivo ou negativo
+    velY = (float)((rand() % 5) + 2) * (-1);
+}
+
+void* bombLoop(void* entrada){
+    BombObject* quaseArgs = (BombObject*) entrada;
+
+    const unsigned int* seed = (unsigned int*)(&entrada);
+    srand((unsigned int)time(NULL)*(*seed));
+
+    quaseArgs -> loop();
+    return NULL;
 }

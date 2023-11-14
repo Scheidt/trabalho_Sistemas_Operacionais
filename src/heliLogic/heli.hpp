@@ -16,10 +16,10 @@ public:
     bool right;
 
     HeliObject(
-        int xa,
-        int ya,
-        int w,
-        int h,
+        float xa,
+        float ya,
+        float w,
+        float h,
         sem_t* sem0a,
         sem_t* sem1a,
         bool* gameLoopa,
@@ -33,3 +33,5 @@ typedef struct choppaArgs {
     bool right;
     int direction;
 } choppaArgs;
+
+void* choppaLoop(void* entrada);
