@@ -1,1 +1,0 @@
-Essa pasta é somente para os arquivos temporarios de build
